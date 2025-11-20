@@ -1,8 +1,0 @@
-[server]
-http_port = 3001
-
-[postgres]
-url = "postgresql://postgres:example@localhost:5432/postgres"
-
-[session]
-secret = "test-secret-key-for-testing-only-not-production-use-minimum-32-chars"
