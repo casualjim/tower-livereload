@@ -3,17 +3,21 @@
 
   addEventListener("pageshow", () => {
     const source = new EventSource(inputs.eventStream);
-    let hasConnected = false;
+    let serverInstanceId = null;
 
-    source.addEventListener("init", () => {
-      // If we've already connected before, this is a reconnection after error
-      // In that case, reload the page to get the latest content
-      if (hasConnected) {
+    source.addEventListener("init", (event) => {
+      const newInstanceId = event.data;
+      
+      // If we have a previous instance ID and it differs from the new one,
+      // the server has restarted - reload the page
+      if (serverInstanceId !== null && serverInstanceId !== newInstanceId) {
         source.close();
         window.location.reload();
+        return;
       }
-      // Mark that we've successfully connected
-      hasConnected = true;
+      
+      // Store the current server instance ID
+      serverInstanceId = newInstanceId;
     });
 
     source.addEventListener("reload", () => {

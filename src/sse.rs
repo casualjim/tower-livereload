@@ -6,6 +6,7 @@ use tokio::sync::broadcast::Receiver;
 pub struct ReloadEventsBody {
     state: State,
     retry_duration: Duration,
+    instance_id: u64,
 }
 
 enum State {
@@ -16,10 +17,11 @@ enum State {
 }
 
 impl ReloadEventsBody {
-    pub fn new(receiver: Receiver<()>, retry_duration: Duration) -> Self {
+    pub fn new(receiver: Receiver<()>, retry_duration: Duration, instance_id: u64) -> Self {
         Self {
             state: State::Initial(receiver),
             retry_duration,
+            instance_id,
         }
     }
 }
@@ -37,7 +39,8 @@ impl http_body::Body for ReloadEventsBody {
                 self.state = State::BeforePending(receiver);
 
                 Poll::Ready(Some(Ok(Frame::data(bytes::Bytes::from_owner(format!(
-                    "event: init\ndata:\nretry: {}\n\n",
+                    "event: init\ndata: {}\nretry: {}\n\n",
+                    self.instance_id,
                     self.retry_duration.as_millis()
                 ))))))
             }
