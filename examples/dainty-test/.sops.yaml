@@ -1,0 +1,3 @@
+creation_rules:
+  - path_regex: \.env\.json
+    kms: arn:aws:kms:us-west-2:880087769380:key/55535a25-24ba-401a-9194-06bf446862d8

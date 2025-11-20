@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+#MISE description="Run the development server for {{ project-name | capitalize }}"
+
+echo "🚀 Starting {{ project-name | capitalize }} development server..."
+proj_dir=$(git rev-parse --show-toplevel)
+cd "$proj_dir" || exit 1
+
+CERT_DIR=".config/certs"
+if [[ ! -d "$CERT_DIR" ]]; then
+  mkdir -p "$CERT_DIR"
+  echo '*.key' > "$CERT_DIR/.gitignore"
+  echo '*.crt' >> "$CERT_DIR/.gitignore"
+fi
+
+if [[ ! -f "$CERT_DIR/tls.crt" || ! -f "$CERT_DIR/tls.key" ]]; then
+  echo "🔐 Generating local TLS certificates..."
+  mkcert -cert-file "$CERT_DIR/tls.crt" -key-file "$CERT_DIR/tls.key" {{ project-name }}.local.wagyu.icu localhost 127.0.0.1 ::1
+fi
+
+export RUST_LOG="warn,{{ project-name }}=debug"
+systemfd --no-reuse --no-pid -s http::8080 -- cargo watch --why -x 'run -- --tls-enabled --tls-key .config/certs/tls.key --tls-cert .config/certs/tls.crt'

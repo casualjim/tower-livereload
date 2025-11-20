@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+#MISE description="Run the tests for {{ project-name | capitalize }}"
+#MISE sources=["Cargo.toml", "sqlc.yaml", "src/**/*.rs", "assets/**"]
+
+mise test:rust
+mise test:e2e

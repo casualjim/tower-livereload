@@ -1,0 +1,11 @@
+/target
+.env
+.env*
+node_modules
+test-results
+playwright*
+!playwright.config.ts*
+/dist
+target/
+node_modules/
+bun.lockb

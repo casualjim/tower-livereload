@@ -1,0 +1,83 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.3.6/schema.json",
+
+  "files": {
+    "ignoreUnknown": true,
+    "includes": [
+      "**/*.ts",
+      "**/*.tsx",
+      "**/*.js",
+      "**/*.jsx",
+      "**/*.json",
+      "!.vscode/settings.json",
+      "!**/node_modules",
+      "!**/dist",
+      "!target"
+    ]
+  },
+  "formatter": {
+    "enabled": true,
+    "useEditorconfig": true,
+    "lineWidth": 120,
+    "indentWidth": 2,
+    "indentStyle": "space"
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "suspicious": {
+        "noExplicitAny": "error",
+        "noImplicitAnyLet": "error"
+      },
+      "style": {
+        "useConst": "error",
+        "noParameterAssign": "error",
+        "useExportType": "error",
+        "useImportType": "error",
+        "noNonNullAssertion": "error",
+        "noRestrictedTypes": {
+          "level": "error",
+          "options": {
+            "types": {
+              "any": {
+                "message": "'any' defeats type safety. Define a precise domain type."
+              },
+              "unknown": {
+                "message": "'unknown' obscures intent. Use a concrete domain type."
+              },
+              "Record<string, unknown>": {
+                "message": "Avoid Record<string, unknown>. Define an index signature with a concrete value type or a dedicated map type alias."
+              },
+              "Record<string, any>": {
+                "message": "Avoid Record<string, any>. Prefer concrete value types."
+              },
+              "Array<unknown>": {
+                "message": "Avoid Array<unknown>. Use a concrete element type."
+              },
+              "ReadonlyArray<unknown>": {
+                "message": "Avoid ReadonlyArray<unknown>. Use a concrete element type."
+              },
+              "Promise<unknown>": {
+                "message": "Avoid Promise<unknown>. Specify the resolved type."
+              }
+            }
+          }
+        },
+        "useConsistentTypeDefinitions": "error"
+      },
+      "complexity": {
+        "noUselessCatch": "error"
+      },
+      "correctness": {
+        "noSwitchDeclarations": "error"
+      },
+      "nursery": {}
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "double"
+    }
+  }
+}

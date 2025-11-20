@@ -1,0 +1,32 @@
+[tools]
+age = "latest"
+bun = "latest"
+sops = "latest"
+rust = { version = "latest", profile = "default", components = "llvm-tools,rust-analyzer,rustfmt,clippy" }
+"ubi:cargo-bins/cargo-binstall" = "latest"
+"cargo:systemfd" = "latest"
+"cargo:cargo-sort" = "latest"
+"aqua:nextest-rs/nextest/cargo-nextest" = "latest"
+mkcert = "latest"
+node = "lts"
+"npm:typescript-language-server" = "latest"
+"go:github.com/sqlc-dev/sqlc/cmd/sqlc" = "latest"
+hk = "latest"
+pkl = "latest"
+java = "latest"
+"cargo:sqlx-cli" = { version = "latest", binstall = true }
+biome = "latest"
+taplo = "latest"
+
+[env]
+_.file = ".env.json"
+
+[settings]
+experimental = true
+
+[hooks]
+postinstall = [
+  "bun install",
+
+  "hk install --mise"
+]

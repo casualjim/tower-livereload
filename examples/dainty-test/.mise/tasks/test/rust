@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+#MISE description="Run the Rust tests for {{ project-name | capitalize }}"
+#MISE sources=["Cargo.toml", "src/**/*.rs"]
+
+echo "🚀 Starting {{ project-name | capitalize }} Rust tests..."
+proj_dir=$(git rev-parse --show-toplevel)
+cd "$proj_dir" || exit 1
+
+set -euo pipefail
+
+export DATABASE_URL=$TEST_DATABASE_URL
+sqlx db reset -y
+
+cargo nextest run --all-features

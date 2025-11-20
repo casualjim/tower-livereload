@@ -1,0 +1,53 @@
+import { defineConfig, devices } from "@playwright/test";
+
+const isCI = !!process.env.CI;
+const retries = (() => {
+  const raw = process.env.PLAYWRIGHT_RETRIES;
+  if (raw === undefined) {
+    return isCI ? 2 : 0;
+  }
+  const parsed = Number(raw);
+  return Number.isFinite(parsed) ? parsed : isCI ? 2 : 0;
+})();
+
+export default defineConfig({
+  testDir: "./tests",
+  timeout: 30_000,
+  globalSetup: "./tests/global-setup.ts",
+  expect: {
+    timeout: 5_000,
+  },
+  fullyParallel: true,
+  forbidOnly: isCI,
+  retries,
+  reporter: [["list"], ["html", { open: "never" }]],
+  use: {
+    actionTimeout: 5_000,
+    baseURL: "http://localhost:3001",
+    viewport: { width: 1280, height: 720 },
+    trace: "retain-on-failure",
+    screenshot: "only-on-failure",
+    video: "retry-with-video",
+  },
+  webServer: {
+    // Start the Rust server for e2e tests on port 3001. Using TEST_MODE to enable
+    // dev/test behaviour in code if necessary.
+    command: "cargo run",
+    port: 3001,
+    reuseExistingServer: false,
+    env: {
+      TEST_MODE: "true",
+      "DAINTY_TEST_HTTP_PORT": "3001",
+      RUST_LOG: "debug",
+    },
+  },
+  projects: [
+    {
+      name: "chromium",
+      use: {
+        ...devices["Desktop Chrome"],
+        viewport: { width: 1280, height: 720 },
+      },
+    },
+  ],
+});

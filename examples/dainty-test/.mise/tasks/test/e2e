@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+#MISE description="Run the end-to-end tests for {{ project-name | capitalize }}"
+#MISE sources=["Cargo.toml", "sqlc.yaml", "package.json", "src/**/*.rs", "assets/**"]
+#MISE depends=["build:debug"]
+
+echo "🚀 Starting {{ project-name | capitalize }} E2E tests..."
+proj_dir=$(git rev-parse --show-toplevel)
+cd "$proj_dir" || exit 1
+
+set -euo pipefail
+
+NODE_EXTRA_CA_CERTS="$(mkcert -CAROOT)/rootCA.pem"
+export NODE_EXTRA_CA_CERTS
+export DATABASE_URL=$TEST_DATABASE_URL
+
+sqlx db reset -y
+
+bun run test

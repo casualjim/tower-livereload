@@ -1,0 +1,80 @@
+name: Template CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-template:
+    name: Test Template Generation
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: timescale/timescaledb-ha:pg18
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_DB: test_project_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout template
+        uses: actions/checkout@v4
+
+      - name: Set up cargo binstall
+        uses: cargo-bins/cargo-binstall@main
+
+      - name: Install cargo-generate
+        run: cargo binstall cargo-generate
+
+      - name: Setup mise in generated project
+        uses: jdx/mise-action@v3
+        with:
+          install: false
+
+      - name: Generate project from template
+        run: |
+          cd ..
+          cargo generate --path ./dainty --name test-project \
+            --allow-commands \
+            -d project_description="Test project generated from template" \
+            -d database_name="test_project"
+
+      - name: Ensure compilation works
+        working-directory: ../test-project
+        run: mise build:debug
+
+      - name: Check formatting
+        run: mise format
+        working-directory: ../test-project
+
+      - name: Run unit tests
+        working-directory: ../test-project
+        env:
+          TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_project_test
+        run: mise test:rust
+
+      - name: Run e2e tests
+        working-directory: ../test-project
+        env:
+          TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_project_test
+        run: |
+          # There are symlinks that don't get copied over by cargo-generate, so we need to reinstall dependencies
+          bun install
+          bunx playwright install --with-deps
+          mise test:e2e
+
+      - name: Build distribution
+        working-directory: ../test-project
+        env:
+          TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_project_test
+        run: mise build:dist

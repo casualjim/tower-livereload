@@ -1,0 +1,15 @@
+[template]
+cargo_generate_version = ">=0.18.0"
+
+[placeholders.project_description]
+type = "string"
+prompt = "Brief project description"
+default = "A full-stack Rust web application"
+
+[placeholders.database_name]
+type = "string"
+prompt = "Database name"
+default = "{{project-name | snake_case}}"
+
+[hooks]
+post = ["post-setup.rhai"]

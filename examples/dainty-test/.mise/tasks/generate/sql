@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+#MISE description="Generate code for SQL in {{ project-name | capitalize }}"
+#MISE sources=["queries/*.sql", "sqlc.yaml"]
+#MISE outputs=["src/pgdb/**/*.rs"]
+
+echo "🚀 Starting {{ project-name | capitalize }} SQL code generation..."
+proj_dir=$(git rev-parse --show-toplevel)
+cd "$proj_dir" || exit 1
+
+sqlc generate
