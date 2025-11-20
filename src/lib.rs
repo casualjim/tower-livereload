@@ -116,7 +116,10 @@ impl Reloader {
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap()
             .as_nanos() as u64;
-        Self { sender, instance_id }
+        Self {
+            sender,
+            instance_id,
+        }
     }
 
     /// Send a reload request to all open clients.
