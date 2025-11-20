@@ -14,16 +14,14 @@ pub struct ReloadEventsBody {
     stream: Option<BroadcastStream<()>>,
     sent_init: bool,
     retry_duration: Duration,
-    instance_id: u64,
 }
 
 impl ReloadEventsBody {
-    pub fn new(receiver: Receiver<()>, retry_duration: Duration, instance_id: u64) -> Self {
+    pub fn new(receiver: Receiver<()>, retry_duration: Duration) -> Self {
         Self {
             stream: Some(BroadcastStream::new(receiver)),
             sent_init: false,
             retry_duration,
-            instance_id,
         }
     }
 }
@@ -40,8 +38,7 @@ impl http_body::Body for ReloadEventsBody {
         if !self.sent_init {
             self.sent_init = true;
             return Poll::Ready(Some(Ok(Frame::data(bytes::Bytes::from_owner(format!(
-                "event: init\ndata: {}\nretry: {}\n\n",
-                self.instance_id,
+                "event: init\ndata:\nretry: {}\n\n",
                 self.retry_duration.as_millis()
             ))))));
         }

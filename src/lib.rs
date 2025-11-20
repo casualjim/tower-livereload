@@ -100,7 +100,6 @@ const DEFAULT_PREFIX: &str = "/_tower-livereload";
 #[derive(Clone, Debug)]
 pub struct Reloader {
     sender: Sender<()>,
-    instance_id: u64,
 }
 
 impl Reloader {
@@ -111,15 +110,7 @@ impl Reloader {
     /// [`Reloader`] that can send reload requests to connected clients.
     pub fn new() -> Self {
         let (sender, _) = tokio::sync::broadcast::channel(1);
-        // Use a timestamp as a unique instance ID for this server instance
-        let instance_id = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_nanos() as u64;
-        Self {
-            sender,
-            instance_id,
-        }
+        Self { sender }
     }
 
     /// Send a reload request to all open clients.
@@ -293,7 +284,6 @@ impl<S, ReqPred, ResPred> LiveReload<S, ReqPred, ResPred> {
                         .body(ReloadEventsBody::new(
                             reloader.sender.subscribe(),
                             reload_interval,
-                            reloader.instance_id,
                         ))
                         .map_err(|_| unreachable!()),
                 );
